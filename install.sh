@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
-VIM_CONFIG_SCRIPT="wget -qO- https://raw.githubusercontent.com/AChris07/vim-config/master/install.sh | bash"
-BREW_CONFIG_SCRIPT="wget -qO- https://raw.githubusercontent.com/AChris07/brew-config/master/install.sh | bash"
+VIM_CONFIG_URL=https://raw.githubusercontent.com/AChris07/vim-config/master/install.sh
+HOMEBREW_CONFIG_URL= https://raw.githubusercontent.com/AChris07/brew-config/master/install.sh
+
+if [ $(command -v curl &> /dev/null; printf $?) -ne 0 ]; then
+  VIM_SETUP=`curl -o- $VIM_CONFIG_URL | bash`
+  HOMEBREW_SETUP=`curl -o- $HOMEBREW_CONFIG_URL | bash`
+elif [ $(command -v wget &> /dev/null; printf $?) -ne 0 ]; then
+  VIM_SETUP=`wget -qO- $VIM_CONFIG_URL | bash`
+  HOMEBREW_SETUP=`wget -qO- $HOMEBREW_CONFIG_URL | bash`
+else
+  echo "Could not find curl or wget. Please install one of these and try again. Aborting..." 1>&2
+  exit 128
+fi
 
 function ramp_mac() {
   echo "Starting up MacOS ramping process..."
@@ -10,10 +21,10 @@ function ramp_mac() {
 
 
   echo "Launching VIM configurer..."
-  ${VIM_CONFIG_SCRIPT} 
+  eval $VIM_SETUP
 
   echo "Launching Brew configurer..."
-  ${BREW_CONFIG_SCRIPT}
+  eval $HOMEBREW_SETUP
 
   echo "Done! Your machine has been ramped and is ready to go!"
 }
